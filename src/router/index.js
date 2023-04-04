@@ -32,6 +32,22 @@ let routes = [
                 path: 'timeTaskManage',
                 name: 'timeTaskManage',
                 component: () => import('../views/timeTaskManage/timeTaskManage')
+            },
+            {
+                path: 'userManage',
+                name: 'userManage',
+                component: () => import('../views/userManage/index')
+            },
+            {
+                path: 'paramManage',
+                name: 'paramManage',
+                component: () => import('../views/system/paramManage/index')
+            }
+            ,
+            {
+                path: 'area',
+                name: 'area',
+                component: () => import('../views/system/paramManage/area')
             }
         ]
     }

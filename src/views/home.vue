@@ -23,15 +23,18 @@
 
                 <el-menu router unique-opened :default-active="defaultActive" class="el-menu-vertical-demo"
                     background-color="#ffffff" text-color="#545c64" :collapse="iscollapse">
+                    <!-- 第一层 -->
                     <div v-for="(item, index) in menuData" :key="index">
                         <el-submenu :index="item.url" v-if="item.children.length > 0">
                             <template slot="title">
                                 <i :class="item.icon"></i>
                                 <span slot="title" style="font-weight: bold" v-if="!iscollapse">{{ item.menuName }}</span>
                             </template>
+                            <!-- 第二层 -->
                             <div :key="i" v-for="(child, i) in item.children">
                                 <el-submenu :index="child.url" v-if="child.children.length > 0">
                                     <template slot="title">{{ child.menuName }}</template>
+                                    <!-- 第三层 -->
                                     <div v-for="(third, i) in child.children">
                                         <el-submenu :index="third.url" v-if="third.children.length > 0">
                                             <template slot="title">{{ third.menuName }}</template>
@@ -110,6 +113,28 @@ export default {
                     menuName: "定时任务",
                     url: "/home/timeTaskManage",
                     children: []
+                }, {
+                    icon: [],
+                    menuName: "用户管理",
+                    url: "/home/userManage",
+                    children: []
+                }, {
+                    icon: [],
+                    menuName: "系统管理",
+                    url: "/home/system",
+                    children: [
+                        {
+                            icon: [],
+                            menuName: "参数管理",
+                            url: "/home/paramManage",
+                            children: []
+                        }, {
+                            icon: [],
+                            menuName: "参数域管理",
+                            url: "/home/area",
+                            children: []
+                        }
+                    ]
                 }
             ],
         }
