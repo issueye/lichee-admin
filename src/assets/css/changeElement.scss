@@ -625,6 +625,10 @@ input::-webkit-input-placeholder {
 
 }
 
+.el-textarea__inner {
+  padding: 5px 5px;
+}
+
 //border-card
 .border-card {
   border-radius: 5px;
@@ -867,7 +871,7 @@ input::-webkit-input-placeholder {
 //修改input框样式
 .el-input__inner {
   border: 1px solid #d9d9d9;
-  padding: 0 8px;
+  padding: 0 5px;
 }
 
 //输入框hover

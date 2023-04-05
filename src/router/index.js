@@ -19,32 +19,38 @@ let routes = [
         redirect: '/login'
     },
     {
+        meta: { title: '登录' },
         path: '/login',
         name: 'login',
         component: () => import('../views/login.vue')
     },
     {
+        meta: { title: '主页' },
         path: '/home',
         name: 'home',
         component: () => import('../views/home.vue'),
         children: [
             {
-                path: 'timeTaskManage',
-                name: 'timeTaskManage',
+                meta: { title: '任务管理' },
+                path: 'job',
+                name: 'job',
                 component: () => import('../views/timeTaskManage/timeTaskManage')
             },
             {
-                path: 'userManage',
-                name: 'userManage',
+                meta: { title: '用户管理' },
+                path: 'user',
+                name: 'user',
                 component: () => import('../views/userManage/index')
             },
             {
-                path: 'paramManage',
-                name: 'paramManage',
+                meta: { title: '参数管理' },
+                path: 'param',
+                name: 'param',
                 component: () => import('../views/system/paramManage/index')
             }
             ,
             {
+                meta: { title: '参数域管理' },
                 path: 'area',
                 name: 'area',
                 component: () => import('../views/system/paramManage/area')

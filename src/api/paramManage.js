@@ -31,7 +31,7 @@ export const apiSaveArea = (params) => {
 };
 
 //删除参数域
-export const apiDelAraea = (params) => {
+export const apiDelArea = (params) => {
     return axios.deleteJSON(`/api/area/${params.id}`)
 };
 

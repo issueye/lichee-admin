@@ -22,10 +22,11 @@
                 <el-table-column label="表达式" prop="expr" min-width="150" align="left" />
                 <el-table-column label="描述" prop="mark" min-width="200" align="left" />
                 <el-table-column label="脚本路径" prop="path" min-width="200" align="left" />
+                <el-table-column label="参数域" prop="area" width="200" align="left" />
                 <el-table-column label="状态" width="100" align="center">
                     <template slot-scope="scope">
                         <el-switch size="mini" v-model="scope.row.enable" @change="editStatus(scope.row, $event)"
-                            active-color="#13ce66" inactive-color="#ff4949" />
+                            active-color="#007AFF" inactive-color="#BFBFBF" />
                     </template>
                 </el-table-column>
                 <el-table-column label="操作" width="150" align="left">
@@ -45,7 +46,7 @@
         </div>
 
         <el-dialog :title="title" width="580px" lock-scroll :close-on-click-modal="false" :visible.sync="visible"
-            @closed="closeDialogEvent">
+            @closed="closeDialogEvent" @open="open()">
             <el-form ref="editForm" :model="editForm" :rules="rules" label-width="80px" label-position="right">
                 <el-form-item label="任务名称" prop="name" style="margin-right: 0">
                     <el-input v-model="editForm.name" clearable></el-input>
@@ -53,15 +54,19 @@
                 <el-form-item label="表达式" prop="expr" style="margin-right: 0">
                     <el-input v-model="editForm.expr" @focus="expressVisible = true" clearable></el-input>
                 </el-form-item>
-
                 <el-form-item label="任务描述" prop="mark" style="margin-right: 0">
-                    <el-input type="textarea" :rows="3" placeholder="请输入内容" style="width: 434px" clearable
+                    <el-input type="textarea" :rows="3" placeholder="请输入内容" style="width: 447px" clearable
                         v-model="editForm.mark">
                     </el-input>
                 </el-form-item>
                 <el-form-item label="脚本路径" prop="path" style="margin-right: 0">
-                    <el-input placeholder="请输入内容" style="width: 434px" clearable v-model="editForm.path">
+                    <el-input placeholder="请输入内容" style="width: 447px" clearable v-model="editForm.path">
                     </el-input>
+                </el-form-item>
+                <el-form-item label="参数域" prop="area_id" style="margin-right: 0">
+                    <el-select v-model.number="editForm.area_id" placeholder="请选择参数域" @change="search">
+                        <el-option v-for="item in areaOptions" :key="item.id" :label="item.name" :value="item.id" />
+                    </el-select>
                 </el-form-item>
             </el-form>
             <div slot="footer">
@@ -86,6 +91,7 @@ import {
     getTaskList,
     saveTaskName
 } from "../../api/timeTaskManage";
+import { apiGetAreaList } from '../../api/paramManage';
 
 export default {
     name: "timeTaskManage",
@@ -105,34 +111,24 @@ export default {
             type: '',//打开弹窗的类型
             visible: false,
 
+            // 参数域
+            areaOptions: [],
+
             editForm: {
                 id: '',
                 name: '',
                 expr: '',
                 mark: '',
                 path: '',
-                cip: ''
+                area_id: ''
             },
             rules: {
-                name: [
-                    { required: true, message: '请填写任务名称', trigger: 'change' },
-
-                ],
-                expr: [
-                    { required: true, message: '表达式', trigger: 'change' },
-
-                ],
-                mark: [
-                    { required: true, message: '请填写任务描述', trigger: 'change' }
-                ],
-                path: [
-                    { required: true, message: '请填写任务脚本', trigger: 'change' }
-                ]
+                name: [{ required: true, message: '请填写任务名称', trigger: 'change' }],
+                expr: [{ required: true, message: '表达式', trigger: 'change' }],
+                mark: [{ required: true, message: '请填写任务描述', trigger: 'change' }],
+                path: [{ required: true, message: '请填写任务脚本', trigger: 'change' }]
             },
-            IPlist: [],
-
             saveLoading: false,
-
             //表达式弹窗
             expressVisible: false,
             expression: ''
@@ -151,6 +147,24 @@ export default {
 
         search() {
             this.searchTask()
+        },
+
+        // 打开弹窗
+        async open() {
+            this.areaOptions = []
+            // 查询参数域
+            let { data } = await apiGetAreaList();
+            console.log('data', data);
+            if (data.code == 200) {
+                data.data.forEach(e => {
+                    this.areaOptions.push(
+                        {
+                            id: e.id,
+                            name: e.name
+                        }
+                    )
+                });
+            }
         },
 
         // 重置表单
@@ -176,7 +190,6 @@ export default {
 
             const { data } = await getTaskList(params);
             if (data.code === 200) {
-                console.log(data)
                 this.tableData = data.data;
                 this.total = 0;
                 if (this.tableData.length) {
@@ -205,6 +218,7 @@ export default {
                 this.editForm.status = row.status;
                 this.editForm.mark = row.mark;
                 this.editForm.path = row.path;
+                this.editForm.area_id = row.area_id;
             }
 
         },
@@ -222,7 +236,8 @@ export default {
                         name: this.editForm.name,
                         expr: this.editForm.expr,
                         mark: this.editForm.mark,
-                        path: this.editForm.path
+                        path: this.editForm.path,
+                        area_id: this.editForm.area_id
                     };
                     if (this.type === 'add') {
                         const { data: newData } = await saveTaskName(params);
@@ -246,7 +261,6 @@ export default {
                             this.closeDialog();
                         }
                     }
-
                 } else {
                     console.log('error submit!!');
                     return false;
@@ -255,7 +269,6 @@ export default {
         },
 
         async delTaskList(row) {
-
             this.$confirm('确定删除当前数据吗？', '提示', {
                 confirmButtonText: '确定',
                 cancelButtonText: '取消',
@@ -266,7 +279,6 @@ export default {
                 };
 
                 const { data } = await delTask(params);
-
                 if (data.code === 200) {
                     this.$message({
                         type: 'success',
@@ -314,17 +326,15 @@ export default {
         closeDialogEvent() {
             this.editForm = {
                 id: '',
-                taskName: '',
-                expression: '',
-                taskDes: '',
-                taskScript: '',
-                cip: ''
+                name: '',
+                expr: '',
+                mark: '',
+                path: '',
+                area_id: ''
             }
             this.$refs['editForm'].resetFields();
         },
-        closeExpressDialog() {
-
-        },
+        closeExpressDialog() { },
     }
 }
 </script>

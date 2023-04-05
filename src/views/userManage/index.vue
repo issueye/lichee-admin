@@ -26,7 +26,7 @@
                 <el-table-column label="状态" width="100" align="center">
                     <template slot-scope="scope">
                         <el-switch size="mini" v-model="scope.row.enable" :active-value="1" :inactive-value="0"
-                            @change="editStatus(scope.row, $event)" active-color="#13ce66" inactive-color="#ff4949" />
+                            @change="editStatus(scope.row, $event)" active-color="#007AFF" inactive-color="#BFBFBF" />
                     </template>
                 </el-table-column>
                 <el-table-column label="操作" width="150" align="left">
@@ -56,7 +56,7 @@
                 </el-form-item>
 
                 <el-form-item label="备注" prop="mark" style="margin-right: 0">
-                    <el-input type="textarea" :rows="3" placeholder="请输入内容" style="width: 434px" clearable
+                    <el-input type="textarea" :rows="3" placeholder="请输入内容" style="width: 447px" clearable
                         v-model="editForm.mark">
                     </el-input>
                 </el-form-item>
@@ -233,6 +233,14 @@ export default {
 
         // 删除用户信息
         async delUser(row) {
+            if (row.id === 10000) {
+                this.$message({
+                    type: 'warning',
+                    message: `${row.name}，不允许删除`
+                });
+                return
+            }
+
             this.$confirm('确定删除当前数据吗？', '提示', {
                 confirmButtonText: '确定',
                 cancelButtonText: '取消',
@@ -268,8 +276,15 @@ export default {
 
         //编辑状态
         async editStatus(row, val) {
-            console.log("row", row)
-            console.log("val", val)
+            if (row.id === 10000) {
+                this.$message({
+                    type: 'warning',
+                    message: `${row.name}，不允许修改状态`
+                });
+                this.getUserList();
+                return
+            }
+
             let params = {
                 id: row.id,
                 status: val

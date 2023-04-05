@@ -17,9 +17,9 @@
                 </el-form-item>
             </el-form>
             <el-table v-loading="loading" :data="tableData" :height="tableHeight" stripe border highlight-current-row>
-                <el-table-column label="ID" prop="id" align="left" width="180" />
-                <el-table-column label="名称" prop="name" align="left" width="300" />
-                <el-table-column label="备注" prop="mark" min-width="150" align="left" />
+                <el-table-column label="ID" prop="id" align="left" width="200" />
+                <el-table-column label="名称" prop="name" align="left" min-width="200" />
+                <el-table-column label="备注" prop="mark" min-width="200" align="left" />
                 <el-table-column label="操作" width="150" align="left">
                     <template slot-scope="scope">
                         <el-button type="text" size="mini" class="margin-right8" @click="openDialog('edit', scope.row)">编辑
@@ -43,7 +43,7 @@
                     <el-input v-model="editForm.name" clearable></el-input>
                 </el-form-item>
                 <el-form-item label="备注" prop="mark" style="margin-right: 0">
-                    <el-input type="textarea" :rows="3" placeholder="请输入内容" style="width: 434px" clearable
+                    <el-input type="textarea" :rows="3" placeholder="请输入内容" style="width: 447px" clearable
                         v-model="editForm.mark">
                     </el-input>
                 </el-form-item>
@@ -57,17 +57,32 @@
 </template>
 
 <script>
-import { thistle } from "color-name";
 import {
     apiGetAreaList,
     apiSaveArea,
-    apiDelAraea,
+    apiDelArea,
     apiEditArea
 } from "../../../api/paramManage";
 
 export default {
     name: "paramManage",
     data() {
+
+        // 参数域名称只能输入字母
+        let validateAreaName = (rule, value, callback) => {
+            if (value === '') {
+                callback(new Error('名称不能为空'))
+            } else {
+                // 字母
+                let alphabet = value.match(/([A-Za-z]+)/)
+                if (alphabet) {
+                    callback()
+                } else {
+                    callback(new Error('名称错误! (只允许字母)'))
+                }
+            }
+        }
+
         return {
             form: {
                 name: ''
@@ -95,7 +110,10 @@ export default {
 
             // 规则
             rules: {
-                name: [{ required: true, message: '请填写参数名称', trigger: 'change' }]
+                name: [
+                    { required: true, message: '请填写参数域名称', trigger: 'change' },
+                    { validator: validateAreaName, trigger: 'blur' }
+                ]
             },
 
             // 保存时的 loading
@@ -183,8 +201,17 @@ export default {
 
         // 删除参数域
         async delArea(row) {
+            // console.log('delArea', row);
+            if (row.id == 10000) {
+                this.$message({
+                    type: 'warning',
+                    message: `${row.name}，不允许删除`
+                });
+                return
+            }
+
             try {
-                const { data } = await apiDelAraea(row)
+                const { data } = await apiDelArea(row)
                 if (data.code == 200) {
                     this.$message({
                         type: 'success',

@@ -22,10 +22,10 @@
                 </el-form-item>
             </el-form>
             <el-table v-loading="loading" :data="tableData" :height="tableHeight" stripe border highlight-current-row>
-                <el-table-column label="参数域" prop="area" align="left" width="180" />
-                <el-table-column label="名称" prop="name" align="left" width="180" />
-                <el-table-column label="值" prop="value" width="300" align="left" />
-                <el-table-column label="备注" prop="mark" min-width="150" align="left" />
+                <el-table-column label="参数域" prop="area" align="left" width="200" />
+                <el-table-column label="名称" prop="name" align="left" width="300" />
+                <el-table-column label="值" prop="value" align="left" min-width="200" />
+                <el-table-column label="备注" prop="mark" min-width="200" align="left" />
                 <el-table-column label="操作" width="150" align="left">
                     <template slot-scope="scope">
                         <el-button type="text" size="mini" class="margin-right8" @click="openDialog('edit', scope.row)">编辑
@@ -58,7 +58,7 @@
                 </el-form-item>
 
                 <el-form-item label="备注" prop="mark" style="margin-right: 0">
-                    <el-input type="textarea" :rows="3" placeholder="请输入内容" style="width: 434px" clearable
+                    <el-input type="textarea" :rows="3" placeholder="请输入内容" style="width: 447px" clearable
                         v-model="editForm.mark">
                     </el-input>
                 </el-form-item>

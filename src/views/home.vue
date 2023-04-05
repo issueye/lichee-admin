@@ -20,9 +20,8 @@
         </el-header>
         <el-container>
             <el-aside :width="computeMenuWidth" class="aside">
-
                 <el-menu router unique-opened :default-active="defaultActive" class="el-menu-vertical-demo"
-                    background-color="#ffffff" text-color="#545c64" :collapse="iscollapse">
+                    background-color="#ffffff" text-color="#545c64" :collapse="iscollapse" @select="handleSelect">
                     <!-- 第一层 -->
                     <div v-for="(item, index) in menuData" :key="index">
                         <el-submenu :index="item.url" v-if="item.children.length > 0">
@@ -72,7 +71,7 @@
                 <div class="tabs-title">
                     <div class="option-box">
                         <div class="nav-tab">
-
+                            <v-tags></v-tags>
                         </div>
                     </div>
                     <!--<i :class="iscollapse ? 'el-icon-arrow-right': 'el-icon-arrow-left'" @click="showCollapse"-->
@@ -88,16 +87,19 @@
 </template>
 
 <script>
-
-
+import vTags from './components/tags.vue';
 export default {
     name: "home",
+    // 加载的组件
+    components: {
+        vTags
+    },
     data() {
         return {
             headerBg: require('../assets/img/header.png'),
             systemLogo: require('../assets/img/lichee.png'),
             userName: '',
-            defaultActive: '/home/timeTaskManage',//当前激活菜单
+            defaultActive: '/home/job',//当前激活菜单
             iscollapse: false,
             collapseStyle: {
                 position: 'absolute',
@@ -106,17 +108,16 @@ export default {
                 cursor: 'pointer',
                 transition: 'all 1s'
             },
-
             menuData: [
                 {
                     icon: [],
                     menuName: "定时任务",
-                    url: "/home/timeTaskManage",
+                    url: "/home/job",
                     children: []
                 }, {
                     icon: [],
                     menuName: "用户管理",
-                    url: "/home/userManage",
+                    url: "/home/user",
                     children: []
                 }, {
                     icon: [],
@@ -126,7 +127,7 @@ export default {
                         {
                             icon: [],
                             menuName: "参数管理",
-                            url: "/home/paramManage",
+                            url: "/home/param",
                             children: []
                         }, {
                             icon: [],
@@ -137,11 +138,12 @@ export default {
                     ]
                 }
             ],
+            oneArr: []
         }
     },
     created() {
-        this.$router.replace('/home/timeTaskManage')
-
+        this.$router.replace('/home/job')
+        this.oneArr = this.menuData.reduce((acc, cur) => acc.concat(cur), [])
     },
     mounted() {
 
@@ -149,6 +151,21 @@ export default {
     methods: {
         back() {
             this.$router.push('/login');
+        },
+
+        // 菜单选中
+        handleSelect(key, keyPath) {
+            console.log(key, '----> ', keyPath);
+            this.oneArr.findIndex(function (currentValue, currentIndex, currentArray) {
+                if (currentValue.url == key) {
+                    console.log('currentValue', currentValue);
+                }
+            })
+        },
+
+        // 移除
+        removeTab() {
+
         },
     },
 
@@ -228,7 +245,7 @@ export default {
 
 .tabs-title {
     position: relative;
-    padding: 0 20px;
+    padding: 0 2px;
     height: 40px;
 
     /deep/ .el-tabs__header {
@@ -241,7 +258,7 @@ export default {
 
         .nav-tab {
             font-size: 14px;
-            line-height: 36px;
+            line-height: 40px;
         }
     }
 }
