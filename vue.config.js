@@ -9,6 +9,14 @@ module.exports = {
                 pathRewrite: {
                     '^/api': 'api'
                 }
+            },
+            '/ws': {
+                target: 'http://127.0.0.1:10066', //对应自己的接口
+                changeOrigin: true,
+                ws: true,
+                pathRewrite: {
+                    '^/ws': ''
+                }
             }
         }
     },

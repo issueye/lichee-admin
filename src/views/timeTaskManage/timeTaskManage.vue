@@ -29,11 +29,13 @@
                             active-color="#007AFF" inactive-color="#BFBFBF" />
                     </template>
                 </el-table-column>
-                <el-table-column label="操作" width="150" align="left">
+                <el-table-column label="操作" width="220" align="left">
                     <template slot-scope="scope">
                         <el-button type="text" size="mini" class="margin-right8" @click="openDialog('edit', scope.row)">编辑
                         </el-button>
-                        <el-button type="text" size="mini" class="red-main" @click="delTaskList(scope.row)">删除</el-button>
+                        <el-button type="text" size="mini" class="red-main" @click="openDialog(scope.row)">删除</el-button>
+                        <el-button type="text" size="mini" class="margin-right8"
+                            @click="openLogDiaLog(scope.row)">查看日志</el-button>
                     </template>
                 </el-table-column>
             </el-table>
@@ -45,6 +47,7 @@
             </div>
         </div>
 
+        <!-- 添加\修改弹窗 -->
         <el-dialog :title="title" width="580px" lock-scroll :close-on-click-modal="false" :visible.sync="visible"
             @closed="closeDialogEvent" @open="open()">
             <el-form ref="editForm" :model="editForm" :rules="rules" label-width="80px" label-position="right">
@@ -75,8 +78,14 @@
             </div>
         </el-dialog>
 
-        <el-dialog title="表达式" lock-scroll width="1080px" :visible.sync="expressVisible" @closed="closeExpressDialog">
+        <!-- 日志弹窗 -->
+        <el-dialog :title="logTitle" width="50%" lock-scroll :close-on-click-modal="false" :visible.sync="logVisible"
+            @closed="closeLogDialog">
+            <el-input type="textarea" :rows="30" placeholder="请输入内容" v-model="logContent" :readonly="true" />
+        </el-dialog>
 
+        <!-- 时间表达式弹窗 -->
+        <el-dialog title="表达式" lock-scroll width="1080px" :visible.sync="expressVisible" @closed="closeExpressDialog">
             <vcrontab :expression="expression" @fill="getExpressionData" @hide="expressVisible = false" />
         </el-dialog>
     </div>
@@ -92,6 +101,7 @@ import {
     saveTaskName
 } from "../../api/timeTaskManage";
 import { apiGetAreaList } from '../../api/paramManage';
+
 
 export default {
     name: "timeTaskManage",
@@ -131,19 +141,45 @@ export default {
             saveLoading: false,
             //表达式弹窗
             expressVisible: false,
-            expression: ''
+            // log
+            logVisible: false,
+            logTitle: '',
+            expression: '',
+            logContent: '',
+            // websocket 连接对象
+            ws: {}
         }
     },
     components: {
         vcrontab,
     },
     created() {
+
         this.getTaskList();
     },
     mounted() {
         this.tableHeight = document.documentElement.clientHeight - 245;
     },
     methods: {
+
+        closeLogDialog() {
+            // this.ws.
+            this.ws.close()
+            // 关闭对象
+            console.log('关闭连接 ws');
+        },
+
+        // 打开日志弹窗
+        openLogDiaLog(row) {
+            this.logVisible = true
+            this.logTitle = `${row.name}->日志`
+            this.logContent = ""
+
+            this.ws = new WebSocket(`ws://${location.hostname}:10066/ws?name=${row.name}`)
+            this.ws.onmessage = (data) => {
+                this.logContent += data.data + '\n'
+            }
+        },
 
         search() {
             this.searchTask()
@@ -157,12 +193,15 @@ export default {
             console.log('data', data);
             if (data.code == 200) {
                 data.data.forEach(e => {
-                    this.areaOptions.push(
-                        {
-                            id: e.id,
-                            name: e.name
-                        }
-                    )
+                    if (e.id !== 10000) {
+                        this.areaOptions.push(
+                            {
+                                id: e.id,
+                                name: e.name
+                            }
+                        )
+                    }
+
                 });
             }
         },
