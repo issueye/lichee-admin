@@ -121,6 +121,11 @@ export default {
                     children: []
                 }, {
                     icon: [],
+                    menuName: "数据库源管理",
+                    url: "/home/db",
+                    children: []
+                }, {
+                    icon: [],
                     menuName: "系统管理",
                     url: "/home/system",
                     children: [

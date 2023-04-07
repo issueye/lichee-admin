@@ -42,6 +42,13 @@ let routes = [
                 name: 'user',
                 component: () => import('../views/userManage/index')
             },
+            ,
+            {
+                meta: { title: '数据库源管理' },
+                path: 'db',
+                name: 'db',
+                component: () => import('../views/db/index')
+            },
             {
                 meta: { title: '参数管理' },
                 path: 'param',
