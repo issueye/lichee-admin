@@ -91,6 +91,11 @@ export default {
                             this.loginLoading = false;
                             if (result.data.code === 200) {
                                 console.log('登录返回', result)
+
+                                let token = result.data.data.token;
+                                console.log('token', token);
+                                window.sessionStorage.setItem('token', token);
+
                                 this.$message({
                                     message: '登录成功',
                                     type: 'success'

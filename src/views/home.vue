@@ -163,7 +163,7 @@ export default {
             console.log(key, '----> ', keyPath);
             this.oneArr.findIndex(function (currentValue, currentIndex, currentArray) {
                 if (currentValue.url == key) {
-                    console.log('currentValue', currentValue);
+                    // console.log('currentValue', currentValue);
                 }
             })
         },

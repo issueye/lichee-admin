@@ -7,10 +7,10 @@ axios.changeIsWithCredentials(false);
 // 添加请求拦截器
 axios.interceptors.request.use((config) => {
     if (window.sessionStorage.getItem('token')) {
-        config.headers["token"] = window.sessionStorage.getItem('token');
+        config.headers["Authorization"] = window.sessionStorage.getItem('token');
     }
     else { //没有token移除
-        config.headers["token"] = '';
+        config.headers["Authorization"] = '';
     }
     return config;
 }, function (error) {
