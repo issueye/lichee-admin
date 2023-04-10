@@ -35,32 +35,31 @@ let routes = [
                 path: 'job',
                 name: 'job',
                 component: () => import('../views/timeTaskManage/timeTaskManage')
-            },
-            {
+            }, {
                 meta: { title: '用户管理' },
                 path: 'user',
                 name: 'user',
                 component: () => import('../views/userManage/index')
-            },
-            ,
-            {
+            }, {
                 meta: { title: '数据库源管理' },
                 path: 'db',
                 name: 'db',
                 component: () => import('../views/db/index')
-            },
-            {
+            }, {
                 meta: { title: '参数管理' },
                 path: 'param',
                 name: 'param',
                 component: () => import('../views/system/paramManage/index')
-            }
-            ,
-            {
+            }, {
                 meta: { title: '参数域管理' },
                 path: 'area',
                 name: 'area',
                 component: () => import('../views/system/paramManage/area')
+            }, {
+                meta: { title: '代码编辑' },
+                path: 'code',
+                name: 'code',
+                component: () => import('../views/codeEdit/index')
             }
         ]
     }

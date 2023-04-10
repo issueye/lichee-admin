@@ -29,13 +29,16 @@
                             active-color="#007AFF" inactive-color="#BFBFBF" />
                     </template>
                 </el-table-column>
-                <el-table-column label="操作" width="220" align="left">
+                <el-table-column label="操作" width="300" align="left">
                     <template slot-scope="scope">
                         <el-button type="text" size="mini" class="margin-right8" @click="openDialog('edit', scope.row)">编辑
                         </el-button>
                         <el-button type="text" size="mini" class="red-main" @click="openDialog(scope.row)">删除</el-button>
                         <el-button type="text" size="mini" class="margin-right8"
                             @click="openLogDiaLog(scope.row)">查看日志</el-button>
+
+                        <el-button type="text" size="mini" class="margin-right8"
+                            @click="atOnceRun(scope.row.id)">测试运行</el-button>
                     </template>
                 </el-table-column>
             </el-table>
@@ -81,6 +84,7 @@
         <!-- 日志弹窗 -->
         <el-dialog :title="logTitle" width="50%" lock-scroll :close-on-click-modal="false" :visible.sync="logVisible"
             @closed="closeLogDialog">
+            <el-button size="mini" class="testRun" @click="atOnceRun(logId)">测试运行</el-button>
             <el-input type="textarea" :rows="30" placeholder="请输入内容" v-model="logContent" :readonly="true" />
         </el-dialog>
 
@@ -94,11 +98,12 @@
 <script>
 import vcrontab from 'vcrontab'
 import {
-    delTask,
-    editTaskName,
-    editTaskStatus,
-    getTaskList,
-    saveTaskName
+    apiDelTask,
+    apiEditTaskName,
+    apiEditTaskStatus,
+    apiGetTaskList,
+    apiSaveTaskName,
+    apiAtOnceRun
 } from "../../api/timeTaskManage";
 import { apiGetAreaList } from '../../api/paramManage';
 
@@ -146,6 +151,7 @@ export default {
             logTitle: '',
             expression: '',
             logContent: '',
+            logId: '',
             // websocket 连接对象
             ws: {}
         }
@@ -154,13 +160,22 @@ export default {
         vcrontab,
     },
     created() {
-
         this.getTaskList();
     },
     mounted() {
         this.tableHeight = document.documentElement.clientHeight - 245;
     },
     methods: {
+        async atOnceRun(id) {
+            let { data } = await apiAtOnceRun(id)
+            if (data.code === 200) {
+                // 添加到任务中
+                this.$message({
+                    type: 'success',
+                    message: data.message,
+                })
+            }
+        },
 
         closeLogDialog() {
             // this.ws.
@@ -174,8 +189,8 @@ export default {
             this.logVisible = true
             this.logTitle = `${row.name}->日志`
             this.logContent = ""
-
-            this.ws = new WebSocket(`ws://${location.hostname}:10066/ws?name=${row.name}`)
+            this.logId = row.id
+            this.ws = new WebSocket(`ws://${location.host}/ws?name=${row.name}`)
             this.ws.onmessage = (data) => {
                 this.logContent += data.data + '\n'
             }
@@ -227,7 +242,7 @@ export default {
                 mark: this.form.mark
             };
 
-            const { data } = await getTaskList(params);
+            const { data } = await apiGetTaskList(params);
             if (data.code === 200) {
                 this.tableData = data.data;
                 this.total = 0;
@@ -279,7 +294,7 @@ export default {
                         area_id: this.editForm.area_id
                     };
                     if (this.type === 'add') {
-                        const { data: newData } = await saveTaskName(params);
+                        const { data: newData } = await apiSaveTaskName(params);
                         if (newData.code === 200) {
                             this.$message({
                                 type: 'success',
@@ -290,7 +305,7 @@ export default {
                         }
                     }
                     else {
-                        const { data: editData } = await editTaskName(params);
+                        const { data: editData } = await apiEditTaskName(params);
                         if (editData.code === 200) {
                             this.$message({
                                 type: 'success',
@@ -317,7 +332,7 @@ export default {
                     id: row.id
                 };
 
-                const { data } = await delTask(params);
+                const { data } = await apiDelTask(params);
                 if (data.code === 200) {
                     this.$message({
                         type: 'success',
@@ -345,7 +360,7 @@ export default {
                 id: row.id,
                 status: val
             };
-            const { data } = await editTaskStatus(params);
+            const { data } = await apiEditTaskStatus(params);
             if (data.code === 200) {
                 this.$message({
                     type: 'success',
@@ -382,6 +397,10 @@ export default {
 .container {
     background-color: #ffffff;
     padding: 8px 12px;
+}
+
+.testRun {
+    margin-bottom: 10px;
 }
 
 /deep/ .el-dialog .el-dialog__body {

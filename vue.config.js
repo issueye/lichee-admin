@@ -1,3 +1,5 @@
+// const MonacoWebpackPlugin = require('monaco-editor-webpack-plugin')
+
 module.exports = {
     publicPath: './',
     devServer: {
@@ -15,11 +17,19 @@ module.exports = {
                 changeOrigin: true,
                 ws: true,
                 pathRewrite: {
-                    '^/ws': ''
+                    '^/ws': 'socket'
                 }
             }
         }
     },
+
+    configureWebpack: {
+        plugins: [
+            // 注意，这里的插件得是6.3.2版本的，最新的v11不支持vue-cli-service
+            // new MonacoWebpackPlugin()
+        ],
+    },
+
     chainWebpack: config => {
         config
             .entry('index')
